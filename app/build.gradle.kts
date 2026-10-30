@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.mayconrob.coinflow"
+    namespace = "com.mayconrob.breadflow"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.mayconrob.coinflow"
+        applicationId = "com.mayconrob.breadflow"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

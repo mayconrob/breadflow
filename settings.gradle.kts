@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "coin-flow"
+rootProject.name = "BreadFlow"
 include(":app")

@@ -1,61 +1,75 @@
-﻿# CoinFlow
+## 🌾 Sobre o BreadFlow
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.0+-7F52FF.svg?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
-[![Android](https://img.shields.io/badge/Android-API_26+-3DDC84.svg?logo=android&logoColor=white)](https://developer.android.com/)
-[![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4.svg?logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
+O **BreadFlow** é um aplicativo Android nativo, gratuito e de código aberto (*open source*), criado para ajudar você a administrar suas finanças diárias com consciência, serenidade e responsabilidade. 
 
-O **CoinFlow** é um aplicativo Android nativo desenvolvido para ajudar no controle e organização financeira pessoal. Construído totalmente em **Kotlin** com as tecnologias mais modernas do ecossistema Android, ele utiliza **Jetpack Compose** para a interface declarativa e **Room Database** para o armazenamento local persistente, seguro e privativo.
+Inspirado no conceito do **"pão de cada dia"**, o BreadFlow reflete a gratidão pelo sustento que nos alcança a cada manhã. A espiga de trigo representa a provisão divina e o fruto do trabalho honesto; o fluxo harmônico (*flow*) simboliza o cuidado contínuo e a boa mordomia com aquilo que recebemos e gastamos.
+
+---
+
+## 🛡️ Nossos Pilares Inegociáveis
+
+1. 🌐 **Sempre Open Source (GPLv3)**: Software livre por convicção. O código é transparente, auditável e continuará acessível a todos, sem paywalls, planos pagos ou recursos ocultos.
+2. 🔒 **Device-First (Privacidade Absoluta)**: Os dados financeiros pertencem **única e exclusivamente a você**. O armazenamento é 100% local no seu smartphone (Room Database). Nenhum extrato, saldo ou transação é enviado para nuvens de terceiros ou minerado para anúncios.
+3. 🌾 **Foco & Fluidez**: Interface rápida e intuitiva (*Hero Amount*, digitação estilo bancário em tempo real e divulgação progressiva). Registrar um café ou o almoço leva menos de 3 segundos, sem formulários burocráticos.
+4. 🏗️ **Qualidade Técnica & Estudo Contínuo**: Desenvolvido na vanguarda do ecossistema Android — Single Activity Architecture, Jetpack Compose, Material 3, Clean Architecture (Domain, Data, UI), Coroutines, Flow e Hilt.
+5. 🤖 **Parceria com Inteligência Artificial**: Desenvolvido explorando o estado da arte da engenharia de software contemporânea, onde o desenvolvedor e a IA colaboram para projetar componentes visuais e padrões arquiteturais de alta qualidade.
 
 ---
 
 ## ✨ Funcionalidades
 
-- 📊 **Gestão de Transações:** Permite cadastrar, editar e excluir entrada e saída financeira de forma simples.
-- 🗂️ **Categorização Inteligente:** Organização de gastos por categorias personalizáveis.
-- 📈 **Painel de Controle (Dashboard):** Saldo total acumulado, entradas e saídas consolidadas por mês/ano selecionável.
-- 📜 **Extrato Financeiro Completo:** Histórico detalhado com pesquisa e filtros avançados.
-- 💾 **Armazenamento 100% Local:** Seus dados financeiros nunca saem do seu dispositivo.
-- 🎨 **Material 3 Design:** Interface moderna, responsiva e integrada ao Modo Escuro (Dark Theme).
+- 💰 **Digitação Estilo Caixa Eletrônico:** Entrada do valor ágil da direita para a esquerda em formato de centavos e milhares (`pt-BR`).
+- 📊 **Gestão Completa de Transações:** Cadastro rápido de entradas e saídas, com descrição opcional e suporte a tags e observações em acordeão expansível.
+- 🗂️ **Categorização Inteligente:** Organização de receitas e despesas por categorias personalizáveis com cores e limites de orçamento.
+- 📈 **Painel de Controle (Dashboard):** Visão consolidada do saldo total, entradas/saídas do mês e acompanhamento do teto de orçamento por categoria.
+- 📜 **Extrato Financeiro Avançado:** Histórico ordenável (mais recentes, mais antigas, maior/menor valor) com filtros cumulativos por data, tipo e categorias.
+- 💾 **100% Offline e Seguro:** Opera perfeitamente sem internet e guarda tudo localmente.
+- 🎨 **Material 3 Dark Theme:** Visual escuro elegante, moderno e confortável para o uso diário.
+
+---
+
+## 🌐 Presença Oficial & Comunidade
+
+Acompanhe o projeto, novidades e atualizações nas redes oficiais pelo identificador **`@useBreadFlow`**:
+
+- 🌍 **Website Oficial:** [breadflow.com.br](https://breadflow.com.br)
+- 📲 **Redes Sociais (`@useBreadFlow`):**
 
 ---
 
 ## 🛠️ Tecnologias e Arquitetura
 
-O projeto foi estruturado seguindo as melhores práticas recomendadas pela Google:
+O projeto foi estruturado seguindo rigorosamente as recomendações de arquitetura moderna da Google:
 
 - **Linguagem:** [Kotlin](https://kotlinlang.org/)
 - **UI Framework:** [Jetpack Compose](https://developer.android.com/jetpack/compose) com [Material 3](https://m3.material.io/)
-- **Arquitetura:** MVVM (Model-View-ViewModel) + Clean Architecture (Separação entre Domain, Models, Mappers e Room Entities)
-- **Persistência de Dados:** [Room Database](https://developer.android.com/training/data-storage/room)
-- **Assincronismo:** Kotlin Coroutines & StateFlow
-- **Injeção de Dependência:** Hilt (Dagger)
-- **Gerenciador de Build:** Gradle (Kotlin DSL)
+- **Arquitetura:** Clean Architecture + MVVM (Model-View-ViewModel) com separação estrita de camadas (`common`, `data`, `domain`, 
+- `ui`)
+- **Persistência Local:** [Room Database](https://developer.android.com/training/data-storage/room)
+- **Concorrência & Reatividade:** Kotlin Coroutines & StateFlow
+- **Injeção de Dependências:** Hilt (Dagger)
+- **Gerenciador de Build:** Gradle com Kotlin DSL (`build.gradle.kts`)
 
 ---
 
 ## 🚀 Melhoria Contínua & Roadmap
 
-O **CoinFlow** está em constante evolução arquitetural e funcional. As próximas etapas planejadas para a melhoria contínua do projeto incluem:
+O **BreadFlow** evolui constantemente. Nossos próximos passos planejados incluem:
 
-- [ ] **Testes Automatizados:** Implementação de suítes de testes unitários (JUnit / MockK) para ViewModels e Use Cases, além de testes de UI com Jetpack Compose.
-- [ ] **Exportação de Dados:** Funcionalidade para exportar e importar dados financeiros em formatos como CSV ou JSON.
-- [ ] **Gráficos e Relatórios Avançados:** Inclusão de gráficos interativos de pizza/barra para análise detalhada de gastos por categoria e histórico mensal.
-- [ ] **Internacionalização (i18n):** Suporte a múltiplos idiomas (Português, Inglês e Espanhol).
-- [ ] **Segurança Adicional:** Suporte opcional a autenticação biométrica (BiometricPrompt) para acesso ao aplicativo.
-
----
-
-## 🤖 Uso de Inteligência Artificial
-
-A interface gráfica do **CoinFlow** (desenvolvida em **Jetpack Compose** com Material 3) foi desenhada e estruturada com o auxílio de **Inteligência Artificial**, otimizando o fluxo de prototipagem e a construção dos componentes visuais da aplicação.
+- [ ] **Testes Automatizados:** Implementação de testes unitários para ViewModels e Casos de Uso, além de testes de interface com Compose.
+- [ ] **Exportação & Backup Local:** Exportação/importação de relatórios em CSV e backup local seguro em JSON.
+- [ ] **Gráficos e Estatísticas:** Visualização analítica em gráficos de barra e pizza por categoria ao longo dos meses.
+- [ ] **Internacionalização (i18n):** Suporte nativo para múltiplos idiomas (Inglês e Espanhol).
+- [ ] **Segurança Adicional:**
+  - Desbloqueio biométrico (`BiometricPrompt`) para abertura do aplicativo.
+  - Criptografia transparente do banco de dados Room via `SQLCipher`.
 
 ---
 
 ## 📄 Licença
 
-Este projeto é um software livre distribuído sob os termos da licença **GNU General Public License v3.0 (GPLv3)**. Para mais detalhes, consulte o arquivo [LICENSE](LICENSE).
+Este projeto é um software livre distribuído sob os termos da licença **GNU General Public License v3.0 (GPLv3)**. Você tem a liberdade de estudar, modificar e distribuir o código de forma aberta e transparente. Para mais detalhes, consulte o arquivo [LICENSE](LICENSE).
 
 ---
 
-Desenvolvido com 💙 por **[Maycon Roberto](https://github.com/mayconrob)**
+Desenvolvido com 💙 e propósito por **[Maycon Roberto](https://github.com/mayconrob)**
