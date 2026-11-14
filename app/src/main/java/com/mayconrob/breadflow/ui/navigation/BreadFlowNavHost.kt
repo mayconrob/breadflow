@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.mayconrob.breadflow.ui.screens.AddTransactionRoute
 import com.mayconrob.breadflow.ui.screens.CategoriesRoute
-import com.mayconrob.breadflow.ui.screens.DashboardRoute
+import com.mayconrob.breadflow.ui.screens.HomeRoute
 import com.mayconrob.breadflow.ui.screens.TransactionListRoute
 
 @Composable
@@ -23,7 +23,7 @@ fun BreadFlowNavHost(
         modifier = modifier
     ) {
         composable(Screen.Dashboard.route) {
-            DashboardRoute(
+            HomeRoute(
                 onNavigateToAddTransaction = { type ->
                     navController.navigate(Screen.AddTransaction.createRoute(type))
                 }

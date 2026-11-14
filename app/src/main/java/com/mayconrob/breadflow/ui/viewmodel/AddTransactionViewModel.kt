@@ -33,8 +33,6 @@ class AddTransactionViewModel @Inject constructor(
     private val tagRepository: ITagRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
-
     private val initialTypeArg: String? = savedStateHandle.get<String>("type")
     private val initialType: TransactionType? = initialTypeArg?.let {
         runCatching { TransactionType.valueOf(it) }.getOrNull()

@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,7 +29,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -127,26 +127,14 @@ fun CategoriesScreen(
 
     val context = LocalContext.current
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddCategoryClick,
-                containerColor = AccentIndigo,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.semantics {
-                    contentDescription = context.getString(R.string.cd_text_add_category)
-                }
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null)
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-        modifier = modifier.fillMaxSize()
-    ) { paddingValues ->
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
@@ -170,7 +158,11 @@ fun CategoriesScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        top = 8.dp,
+                        bottom = 88.dp
+                    )
                 ) {
 
                     items(state.categorias) { category ->
@@ -241,7 +233,7 @@ fun CategoriesScreen(
                                                             R.string.cd_text_ceiling_category,
                                                             Formatters.formatCurrency(
                                                                 category.budgetLimit
-                                                             )
+                                                            )
                                                         )
                                                 }
                                             )
@@ -286,6 +278,20 @@ fun CategoriesScreen(
                     }
                 }
             }
+        }
+
+        FloatingActionButton(
+            onClick = onAddCategoryClick,
+            containerColor = AccentIndigo,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+                .semantics {
+                    contentDescription = context.getString(R.string.cd_text_add_category)
+                }
+        ) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = null)
         }
     }
 

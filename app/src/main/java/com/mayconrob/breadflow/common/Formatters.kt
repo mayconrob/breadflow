@@ -11,6 +11,7 @@
 package com.mayconrob.breadflow.common
 
 import java.math.BigDecimal
+import java.text.Normalizer
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -19,7 +20,6 @@ import java.util.Locale
 import java.util.TimeZone
 
 object Formatters {
-
     private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale("pt", "BR"))
     private val shortDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR"))
@@ -29,11 +29,6 @@ object Formatters {
         val safeAmount = amount ?: BigDecimal.ZERO
         return currencyFormat.format(safeAmount)
     }
-
-    fun formatDate(timestamp: Long): String {
-        return dateFormat.format(Date(timestamp))
-    }
-
     fun formatShortDate(timestamp: Long): String {
         return shortDateFormat.format(Date(timestamp))
     }
@@ -74,14 +69,6 @@ object Formatters {
 
         return Pair(startOfMonth, endOfMonth)
     }
-
-    fun getCurrentMonthRange(): Pair<Long, Long> {
-        val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        return getMonthRange(year, month)
-    }
-
     fun getTodayRange(): Pair<Long, Long> {
         val calendar = Calendar.getInstance()
 
@@ -199,5 +186,10 @@ object Formatters {
             set(Calendar.MILLISECOND, 999)
         }
         return calendar.timeInMillis
+    }
+
+    fun removeAccents(text: String): String {
+        val normalized = Normalizer.normalize(text, Normalizer.Form.NFD)
+        return "\\p{InCombiningDiacriticalMarks}+".toRegex().replace(normalized, "")
     }
 }

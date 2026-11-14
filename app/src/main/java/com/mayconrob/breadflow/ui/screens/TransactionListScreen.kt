@@ -1,3 +1,4 @@
+
 package com.mayconrob.breadflow.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +15,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -134,7 +137,25 @@ fun TransactionListScreen(
             value = state.buscaQuery,
             onValueChange = onSearchQueryChanged,
             label = { Text(stringResource(R.string.text_search_transaction)) },
+            placeholder = { Text(stringResource(R.string.text_search_transaction_placeholder)) },
             leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null) },
+            trailingIcon = if (state.buscaQuery.isNotEmpty()) {
+                {
+                    IconButton(onClick = { onSearchQueryChanged("") }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.label_clear_search)
+                        )
+                    }
+                }
+            } else null,
+            supportingText = if (state.buscaQuery.isNotEmpty() &&
+                (if (state.buscaQuery.trim().startsWith("#"))
+                    state.buscaQuery.trim().removePrefix("#").trim()
+                else state.buscaQuery.trim()).length < 2
+            ) {
+                { Text(stringResource(R.string.text_search_min_chars_hint)) }
+            } else null,
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )

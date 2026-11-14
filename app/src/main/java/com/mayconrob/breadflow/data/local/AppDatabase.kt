@@ -78,23 +78,22 @@ abstract class AppDatabase : RoomDatabase() {
                     CategoryEntity(
                         name = context.getString(R.string.text_category_salary),
                         type = TransactionType.ENTRY,
-                        colorHex = "#2E7D32" // Verde Escuro (Trabalho Principal)
+                        colorHex = "#2E7D32" // Verde Floresta
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_category_prolabore),
                         type = TransactionType.ENTRY,
-                        colorHex = "#4CAF50" // Verde Padrão
+                        colorHex = "#43A047" // Verde Médio
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_category_sales),
                         type = TransactionType.ENTRY,
-                        colorHex = "#00ACC1" // Ciano / Azul Turquesa
+                        colorHex = "#00897B" // Verde Petróleo
                     ),
-
                     CategoryEntity(
                         name = context.getString(R.string.text_category_services),
                         type = TransactionType.ENTRY,
-                        colorHex = "##7CB342" //Verde Lima
+                        colorHex = "#00ACC1" // Ciano / Turquesa
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_category_extra),
@@ -102,113 +101,112 @@ abstract class AppDatabase : RoomDatabase() {
                         colorHex = "#7CB342" // Verde Lima
                     ),
                     CategoryEntity(
-                        name = context.getString(R.string.text_category_transfer), // "Transferência / Ajuste de Saldo"
+                        name = "Benefícios",
+                        type = TransactionType.ENTRY,
+                        colorHex = "#FB8C00" // Laranja Âmbar
+                    ),
+                    CategoryEntity(
+                        name = context.getString(R.string.text_category_transfer),
                         type = TransactionType.ENTRY,
                         colorHex = "#0288D1" // Azul Claro
                     ),
                     CategoryEntity(
-                        name = context.getString(R.string.text_category_bolsa_familia), // "Bolsa Família"
+                        name = context.getString(R.string.text_category_retirement),
                         type = TransactionType.ENTRY,
-                        colorHex = "#F57C00" // Laranja
+                        colorHex = "#1E88E5" // Azul Vibrante
                     ),
                     CategoryEntity(
-                        name = context.getString(R.string.text_category_retirement), // "Aposentadoria"
-                        type = TransactionType.ENTRY,
-                        colorHex = "#00897B" // Verde Petróleo
-                    ),
-                    CategoryEntity(
-                        name = context.getString(R.string.text_category_pension), // "Pensão"
+                        name = context.getString(R.string.text_category_pension),
                         type = TransactionType.ENTRY,
                         colorHex = "#3F51B5" // Índigo
                     ),
                     CategoryEntity(
-                        name = context.getString(R.string.text_category_other_entries), // "Outras entradas"
+                        name = context.getString(R.string.text_category_other_entries),
                         type = TransactionType.ENTRY,
-                        colorHex = "#8E24AA" // Roxo Claro
+                        colorHex = "#8E24AA" // Roxo
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_category_freelance),
                         type = TransactionType.ENTRY,
-                        colorHex = "#7CB342" // Verde Lima
+                        colorHex = "#00838F" // Azul Escuro Petróleo
                     ),
 
                     // --- SAÍDAS ---
                     CategoryEntity(
                         name = context.getString(R.string.text_category_housing),
                         type = TransactionType.EXIT,
-                        budgetLimit = BigDecimal("1200.00"),
-                        colorHex = "#6A1B9A" // Roxo Vivo
+                        colorHex = "#6A1B9A" // Roxo Escuro
                     ),
                     CategoryEntity(
-                        name = context.getString(R.string.text_category_supermarket), // Mercado
+                        name = context.getString(R.string.text_category_supermarket),
                         type = TransactionType.EXIT,
-                        budgetLimit = BigDecimal("1000.00"),
-                        colorHex = "#FF8F00" // Laranja Âmbar
+                        colorHex = "#E65100" // Laranja Escuro
                     ),
                     CategoryEntity(
-                        name = context.getString(R.string.text_category_food), // Delivery / Restaurante
+                        name = context.getString(R.string.text_category_food), // Restaurantes / Delivery
                         type = TransactionType.EXIT,
-                        budgetLimit = BigDecimal("200.00"),
-                        colorHex = "#FF3D00" // Vermelho Alaranjado
+                        colorHex = "#D81B60" // Rosa / Magenta Vivo
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_category_transport),
                         type = TransactionType.EXIT,
-                        budgetLimit = BigDecimal("350.00"),
-                        colorHex = "#1E88E5" // Azul Vibrante
+                        colorHex = "#1565C0" // Azul Profundo
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_category_health),
                         type = TransactionType.EXIT,
-                        budgetLimit = BigDecimal("350.00"),
-                        colorHex = "#E53935" // Vermelho
-                    ),
-                    CategoryEntity(
-                        name = context.getString(R.string.text_category_debts),
-                        type = TransactionType.EXIT,
-                        budgetLimit = BigDecimal("150.00"),
-                        colorHex = "#6D4C41" // Marrom
+                        colorHex = "#C62828" // Vermelho Escuro
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_category_leisure),
                         type = TransactionType.EXIT,
-                        budgetLimit = BigDecimal("650.00"),
-                        colorHex = "#D81B60" // Rosa / Magenta
+                        colorHex = "#AD1457" // Rosa Escuro
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_category_transfer_bill),
                         type = TransactionType.EXIT,
-                        colorHex = "#546E7A" // Azul Acinzentado
+                        colorHex = "#455A64" // Azul Acinzentado
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_category_pet),
                         type = TransactionType.EXIT,
-                        budgetLimit = BigDecimal("400.00"),
-                        colorHex = "#FB8C00" // Laranja Quente
+                        colorHex = "#EF6C00" // Laranja Vivo
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_subscriptions),
                         type = TransactionType.EXIT,
-                        budgetLimit = BigDecimal("120.00"),
-                        colorHex = "#8E24AA" // Violeta
+                        colorHex = "#5E35B1" // Roxo Profundo
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_taxes),
                         type = TransactionType.EXIT,
-                        budgetLimit = BigDecimal("0.00"),
-                        colorHex = "#37474F" // Grafite / Escuro
+                        colorHex = "#37474F" // Grafite
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_education),
                         type = TransactionType.EXIT,
-                        budgetLimit = BigDecimal("350.00"),
-                        colorHex = "#00ACC1" // Ciano / Turquesa
+                        colorHex = "#00838F" // Azul Ciano Escuro
+                    ),
+                    // Novas categorias de saída inseridas com harmonia visual:
+                    CategoryEntity(
+                        name = context.getString(R.string.text_category_utilities),
+                        type = TransactionType.EXIT,
+                        colorHex = "#00695C" // Verde Água Escuro
+                    ),
+                    CategoryEntity(
+                        name = context.getString(R.string.text_category_aesthetics),
+                        type = TransactionType.EXIT,
+                        colorHex = "#C2185B" // Rosa Cerise
+                    ),
+                    CategoryEntity(
+                        name = context.getString(R.string.text_category_clothing),
+                        type = TransactionType.EXIT,
+                        colorHex = "#7B1FA2" // Roxo Ametista
                     ),
                     CategoryEntity(
                         name = context.getString(R.string.text_other_expenses),
                         type = TransactionType.EXIT,
-                        budgetLimit = BigDecimal("0.00"),
-                        colorHex = "#757575" // Cinza Neutro
+                        colorHex = "#616161" // Cinza Neutro
                     )
                 )
 

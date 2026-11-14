@@ -6,16 +6,16 @@
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_breadflow"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_breadflow_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BreadFlowApp">
 
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.BreadFlowApp">
+            android:theme="@style/Theme.BreadFlowApp.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

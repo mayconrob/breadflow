@@ -1,11 +1,15 @@
 package com.mayconrob.breadflow.data.local
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.mayconrob.breadflow.domain.enums.TransactionType
 import java.math.BigDecimal
 
-@Entity(tableName = "categories")
+@Entity(
+    tableName = "categories",
+    indices = [Index(value = ["name", "type"], unique = true)]
+)
 data class CategoryEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

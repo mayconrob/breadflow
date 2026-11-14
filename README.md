@@ -1,6 +1,6 @@
 ## 🌾 Sobre o BreadFlow
 
-O **BreadFlow** é um aplicativo Android nativo, gratuito e de código aberto (*open source*), criado para ajudar você a administrar suas finanças diárias com consciência, serenidade e responsabilidade. 
+O **BreadFlow** é um aplicativo Android nativo e de código aberto (*open source*), criado para ajudar você a administrar suas finanças diárias com consciência, serenidade e responsabilidade. 
 
 Inspirado no conceito do **"pão de cada dia"**, o BreadFlow reflete a gratidão pelo sustento que nos alcança a cada manhã. A espiga de trigo representa a provisão divina e o fruto do trabalho honesto; o fluxo harmônico (*flow*) simboliza o cuidado contínuo e a boa mordomia com aquilo que recebemos e gastamos.
 
@@ -25,17 +25,6 @@ Inspirado no conceito do **"pão de cada dia"**, o BreadFlow reflete a gratidão
 - 📜 **Extrato Financeiro Avançado:** Histórico ordenável (mais recentes, mais antigas, maior/menor valor) com filtros cumulativos por data, tipo e categorias.
 - 💾 **100% Offline e Seguro:** Opera perfeitamente sem internet e guarda tudo localmente.
 - 🎨 **Material 3 Dark Theme:** Visual escuro elegante, moderno e confortável para o uso diário.
-
----
-
-## 🌐 Presença Oficial & Comunidade
-
-Acompanhe o projeto, novidades e atualizações nas redes oficiais pelo identificador **`@useBreadFlow`**:
-
-- 🌍 **Website Oficial:** [breadflow.com.br](https://breadflow.com.br)
-- 📲 **Redes Sociais (`@useBreadFlow`):**
-
----
 
 ## 🛠️ Tecnologias e Arquitetura
 

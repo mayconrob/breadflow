@@ -40,12 +40,24 @@ class ExtratoTransacoesViewModel @Inject constructor(
     private val categoriaRepository: ICategoriaRepository
 ) : ViewModel() {
 
-    val categories: StateFlow<List<Category>> = categoriaRepository.all
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    private val _tipoFiltroTransacao = MutableStateFlow(TipoFiltroTransacao.TODAS)
+    val tipoFiltroTransacao = _tipoFiltroTransacao.asStateFlow()
+
+    val categories: StateFlow<List<Category>> = combine(
+        categoriaRepository.all,
+        _tipoFiltroTransacao
+    ) { allCategories, tipoTransacao ->
+        val sorted = allCategories.sortedWith(compareBy({ it.type }, { it.name }))
+        when (tipoTransacao) {
+            TipoFiltroTransacao.TODAS -> sorted
+            TipoFiltroTransacao.ENTRADAS -> sorted.filter { it.type == TransactionType.ENTRY }
+            TipoFiltroTransacao.SAIDAS -> sorted.filter { it.type == TransactionType.EXIT }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
@@ -54,9 +66,6 @@ class ExtratoTransacoesViewModel @Inject constructor(
 
     private val _tipoFiltroData = MutableStateFlow(TipoFiltroData.HOJE)
     val tipoFiltroData = _tipoFiltroData.asStateFlow()
-
-    private val _tipoFiltroTransacao = MutableStateFlow(TipoFiltroTransacao.TODAS)
-    val tipoFiltroTransacao = _tipoFiltroTransacao.asStateFlow()
 
     private val _ordemTransacao = MutableStateFlow(OrdemTransacao.MAIS_RECENTES)
     val ordemTransacao = _ordemTransacao.asStateFlow()
@@ -91,50 +100,58 @@ class ExtratoTransacoesViewModel @Inject constructor(
                 transacaoRepository.all,
                 filtrosParamsFlow
             ) { transactions, params ->
+                val trimmedQuery = params.query.trim()
+                val isTagOnlySearch = trimmedQuery.startsWith("#")
+                val cleanQuery = if (isTagOnlySearch) trimmedQuery.removePrefix("#").trim() else trimmedQuery
+                val isSearchActive = cleanQuery.length >= 2
+                val normalizedQuery = if (isSearchActive) Formatters.removeAccents(cleanQuery) else ""
+
+                // Pre-computa ranges de data uma unica vez fora do loop
+                val todayRange = if (params.tipoData == TipoFiltroData.HOJE) Formatters.getTodayRange() else null
+                val last7DaysRange = if (params.tipoData == TipoFiltroData.ULTIMOS_7_DIAS) Formatters.getLast7DaysRange() else null
+                val periodRange = if (params.tipoData == TipoFiltroData.PERIODO && params.inicio != null && params.fim != null) {
+                    Pair(Formatters.getStartOfDay(params.inicio), Formatters.getEndOfDay(params.fim))
+                } else null
+
                 val transacoesFiltradas = transactions.filter { item ->
+                    // 1. Filtro rapido por Tipo de Transacao (O(1))
+                    when (params.tipoTransacao) {
+                        TipoFiltroTransacao.TODAS -> Unit
+                        TipoFiltroTransacao.ENTRADAS -> if (item.transaction.type != TransactionType.ENTRY) return@filter false
+                        TipoFiltroTransacao.SAIDAS -> if (item.transaction.type != TransactionType.EXIT) return@filter false
+                    }
+
+                    // 2. Filtro rapido por Categorias Selecionadas (O(1))
+                    if (params.filterCatIds.isNotEmpty() && item.transaction.categoryId !in params.filterCatIds) {
+                        return@filter false
+                    }
+
+                    // 3. Filtro por Data (O(1) numerico com ranges pre-calculados)
                     val timestamp = item.transaction.dateTimestamp
-
-                    // 1. Filtro por Data (Sem considerar horário)
                     val matchesDate = when (params.tipoData) {
-                        TipoFiltroData.HOJE -> {
-                            val (startToday, endToday) = Formatters.getTodayRange()
-                            timestamp in startToday..endToday
-                        }
-                        TipoFiltroData.ULTIMOS_7_DIAS -> {
-                            val (start7, end7) = Formatters.getLast7DaysRange()
-                            timestamp in start7..end7
-                        }
-                        TipoFiltroData.PERIODO -> {
-                            if (params.inicio != null && params.fim != null) {
-                                val start = Formatters.getStartOfDay(params.inicio)
-                                val end = Formatters.getEndOfDay(params.fim)
-                                timestamp in start..end
-                            } else true
-                        }
+                        TipoFiltroData.HOJE -> todayRange?.let { timestamp in it.first..it.second } ?: true
+                        TipoFiltroData.ULTIMOS_7_DIAS -> last7DaysRange?.let { timestamp in it.first..it.second } ?: true
+                        TipoFiltroData.PERIODO -> periodRange?.let { timestamp in it.first..it.second } ?: true
                     }
+                    if (!matchesDate) return@filter false
 
-                    // 2. Filtro por Busca de Texto
-                    val matchesQuery = if (params.query.isNotBlank()) {
-                        if (item.transaction.description.isBlank()) {
-                            false
+                    // 4. Filtro por Busca de Texto e/ou Tags (Prefixo # pesquisa exclusivamente tags)
+                    if (isSearchActive) {
+                        val matchesTags = item.transaction.tags.any { tag ->
+                            tag.name.contains(cleanQuery, ignoreCase = true) ||
+                                Formatters.removeAccents(tag.name).contains(normalizedQuery, ignoreCase = true)
+                        }
+
+                        if (isTagOnlySearch) {
+                            if (!matchesTags) return@filter false
                         } else {
-                            item.run { transaction.description.contains(params.query, ignoreCase = true) }
+                            val matchesDescription = item.transaction.description.contains(cleanQuery, ignoreCase = true) ||
+                                Formatters.removeAccents(item.transaction.description).contains(normalizedQuery, ignoreCase = true)
+                            if (!matchesDescription && !matchesTags) return@filter false
                         }
-                    } else {
-                        true
                     }
 
-                    // 3. Filtro por Categorias Selecionadas (Cumulativo)
-                    val matchesCategory = params.filterCatIds.isEmpty() || item.transaction.categoryId in params.filterCatIds
-
-                    // 4. Filtro por Tipo de Transação (Todas / Receitas / Despesas)
-                    val matchesType = when (params.tipoTransacao) {
-                        TipoFiltroTransacao.TODAS -> true
-                        TipoFiltroTransacao.ENTRADAS -> item.transaction.type == TransactionType.ENTRY
-                        TipoFiltroTransacao.SAIDAS -> item.transaction.type == TransactionType.EXIT
-                    }
-
-                    matchesDate && matchesQuery && matchesCategory && matchesType
+                    true
                 }
 
                 // 5. Aplicação da Ordenação dos Resultados
@@ -186,6 +203,7 @@ class ExtratoTransacoesViewModel @Inject constructor(
 
     fun onTipoFiltroTransacaoChanged(tipo: TipoFiltroTransacao) {
         _tipoFiltroTransacao.value = tipo
+        _selectedCategoryIds.value = emptySet()
     }
 
     fun onOrdemTransacaoChanged(ordem: OrdemTransacao) {

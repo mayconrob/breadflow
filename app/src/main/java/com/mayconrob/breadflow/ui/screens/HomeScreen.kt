@@ -1,7 +1,10 @@
 package com.mayconrob.breadflow.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,7 +31,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -60,14 +62,14 @@ import com.mayconrob.breadflow.ui.viewmodel.PainelFinanceiroUiState
 import com.mayconrob.breadflow.ui.viewmodel.PainelFinanceiroViewModel
 
 @Composable
-fun DashboardRoute(
+fun HomeRoute(
+    modifier: Modifier = Modifier,
     onNavigateToAddTransaction: (TransactionType?) -> Unit,
     viewModel: PainelFinanceiroViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    DashboardScreen(
+    HomeScreen(
         state = state,
         onAddTransactionClick = { onNavigateToAddTransaction(null) },
         onEntriesClick = { onNavigateToAddTransaction(TransactionType.ENTRY) },
@@ -81,7 +83,7 @@ fun DashboardRoute(
 }
 
 @Composable
-fun DashboardScreen(
+fun HomeScreen(
     state: PainelFinanceiroUiState,
     onAddTransactionClick: () -> Unit,
     onEntriesClick: () -> Unit,
@@ -93,29 +95,22 @@ fun DashboardScreen(
     modifier: Modifier = Modifier
 ) {
     var showMonthYearPicker by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddTransactionClick,
-                containerColor = AccentIndigo,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.cd_text_add_transaction)
-                )
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-        modifier = modifier.fillMaxSize()
-    ) { paddingValues ->
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(
+                top = 8.dp,
+                bottom = 88.dp
+            )
         ) {
             item {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -300,8 +295,22 @@ fun DashboardScreen(
             }
 
             item {
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
+        }
+
+        FloatingActionButton(
+            onClick = onAddTransactionClick,
+            containerColor = AccentIndigo,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = stringResource(R.string.cd_text_add_transaction)
+            )
         }
 
         if (showMonthYearPicker) {

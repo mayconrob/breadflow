@@ -16,7 +16,7 @@ sealed class Screen(
 ) {
     data object Dashboard : Screen(
         route = "dashboard",
-        titleRes = R.string.text_dashboard,
+        titleRes = R.string.text_home,
         icon = Icons.Default.Dashboard
     )
 
@@ -31,6 +31,7 @@ sealed class Screen(
         titleRes = R.string.text_categories,
         icon = Icons.Default.Category
     )
+
 
     data object AddTransaction {
         const val ROUTE = "add_transaction?type={type}"

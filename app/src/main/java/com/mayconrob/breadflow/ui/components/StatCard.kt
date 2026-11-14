@@ -91,8 +91,11 @@ fun StatCard(
                     Column {
                         Text(
                             text = title,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 15.sp
+                            ),
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         AnimatedContent(
@@ -108,10 +111,12 @@ fun StatCard(
                                 text = if (visible) Formatters.formatCurrency(amount) else stringResource(
                                     R.string.text_hidden_character
                                 ),
-                                style = MaterialTheme.typography.titleMedium.copy(
+                                style = MaterialTheme.typography.headlineLarge.copy(
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp
+                                    fontSize = 32.sp,
+                                    letterSpacing = if (visible) (-0.5).sp else 3.sp
                                 ),
+
                                 maxLines = 1,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.semantics {
@@ -142,8 +147,11 @@ fun StatCard(
                     }
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.Medium
+
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
@@ -167,7 +175,8 @@ fun StatCard(
                             fontSize = 17.sp
                         ),
                         maxLines = 1,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = if (!visible) MaterialTheme.colorScheme.onSurface else dotColor
+                            ?: MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.semantics {
                             if (!visible) {
                                 contentDescription =
