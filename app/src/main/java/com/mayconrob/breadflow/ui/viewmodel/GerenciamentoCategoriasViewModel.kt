@@ -29,7 +29,6 @@ class GerenciamentoCategoriasViewModel @Inject constructor(
     private val categoriaRepository: ICategoriaRepository,
     private val transacaoRepository: ITransacaoRepository
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(GerenciamentoCategoriasUiState())
     val uiState: StateFlow<GerenciamentoCategoriasUiState> = _uiState.asStateFlow()
 
@@ -43,7 +42,12 @@ class GerenciamentoCategoriasViewModel @Inject constructor(
         }
     }
 
-    fun addCategory(name: String, type: TransactionType, budgetLimit: BigDecimal, colorHex: String) {
+    fun addCategory(
+        name: String,
+        type: TransactionType,
+        budgetLimit: BigDecimal,
+        colorHex: String
+    ) {
         viewModelScope.launch {
             val category = Category(
                 name = name,

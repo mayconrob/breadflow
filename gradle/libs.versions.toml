@@ -1,14 +1,14 @@
 [versions]
-agp = "8.3.1"
-kotlin = "1.9.23"
+agp = "8.5.2"
+kotlin = "2.0.21"
 coreKotlin = "1.12.0"
 coreSplashscreen = "1.0.1"
-lifecycleRuntime = "2.7.0"
-activityCompose = "1.8.2"
-composeBom = "2024.02.02"
+lifecycleRuntime = "2.8.6"
+activityCompose = "1.9.3"
+composeBom = "2024.10.01"
 room = "2.6.1"
-navigationCompose = "2.7.7"
-ksp = "1.9.23-1.0.19"
+navigationCompose = "2.8.3"
+ksp = "2.0.21-1.0.25"
 hilt = "2.51"
 hiltNavigationCompose = "1.2.0"
 timber = "5.0.1"
@@ -44,5 +44,6 @@ timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "tim
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }

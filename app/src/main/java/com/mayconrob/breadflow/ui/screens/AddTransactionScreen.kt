@@ -60,6 +60,7 @@ import com.mayconrob.breadflow.ui.theme.DarkCardBorder
 import com.mayconrob.breadflow.ui.theme.DarkSurface
 import com.mayconrob.breadflow.ui.theme.ExpenseRed
 import com.mayconrob.breadflow.ui.theme.IncomeGreen
+import com.mayconrob.breadflow.ui.viewmodel.AddTransactionEvent
 import com.mayconrob.breadflow.ui.viewmodel.AddTransactionUiState
 import com.mayconrob.breadflow.ui.viewmodel.AddTransactionViewModel
 
@@ -76,17 +77,7 @@ fun AddTransactionRoute(
         state = state,
         categories = categories,
         availableTags = allTags,
-        onTypeChanged = viewModel::onTypeChanged,
-        onDescriptionChanged = viewModel::onDescriptionChanged,
-        onAmountChanged = viewModel::onAmountChanged,
-        onCategorySelected = viewModel::onCategorySelected,
-        onNoteChanged = viewModel::onNoteChanged,
-        onDateSelected = viewModel::onDateSelected,
-        onNewTagInputChanged = viewModel::onNewTagInputChanged,
-        onAddTag = viewModel::addTag,
-        onRemoveTag = viewModel::removeTag,
-        onDismissError = viewModel::clearError,
-        onSaveClick = { viewModel.saveTransaction(onSuccess = onBackClick) },
+        onEvent = viewModel::onEvent,
         onBackClick = onBackClick
     )
 }
@@ -97,17 +88,7 @@ fun AddTransactionScreen(
     state: AddTransactionUiState,
     categories: List<Category>,
     availableTags: List<Tag>,
-    onTypeChanged: (TransactionType) -> Unit,
-    onDescriptionChanged: (String) -> Unit,
-    onAmountChanged: (String) -> Unit,
-    onCategorySelected: (Long) -> Unit,
-    onNoteChanged: (String) -> Unit,
-    onDateSelected: (Long) -> Unit,
-    onNewTagInputChanged: (String) -> Unit,
-    onAddTag: (String) -> Unit,
-    onRemoveTag: (String) -> Unit,
-    onDismissError: () -> Unit,
-    onSaveClick: () -> Unit,
+    onEvent: (AddTransactionEvent) -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -198,20 +179,20 @@ fun AddTransactionScreen(
             // 1. Seletor de Tipo (Entrada vs Saída)
             TransactionTypeSelector(
                 selectedType = state.type,
-                onTypeSelected = onTypeChanged
+                onTypeSelected = { onEvent(AddTransactionEvent.OnTypeChanged(it)) }
             )
 
             // 2. Campo do Valor ("Hero Amount")
             HeroAmountField(
                 amountText = state.amountText,
-                onAmountChanged = onAmountChanged,
+                onAmountChanged = { onEvent(AddTransactionEvent.OnAmountChanged(it)) },
                 accentColor = dynamicAccentColor
             )
 
             // 3. Campo Descrição
             OutlinedTextField(
                 value = state.description,
-                onValueChange = onDescriptionChanged,
+                onValueChange = { onEvent(AddTransactionEvent.OnDescriptionChanged(it)) },
                 label = { Text(stringResource(R.string.label_description_optional)) },
                 placeholder = { Text(stringResource(R.string.placeholder_add_transaction_description)) },
                 singleLine = true,
@@ -229,33 +210,33 @@ fun AddTransactionScreen(
             CategoryDropdownField(
                 categories = filteredCategories,
                 selectedCategoryId = state.selectedCategoryId,
-                onCategorySelected = onCategorySelected,
+                onCategorySelected = { onEvent(AddTransactionEvent.OnCategorySelected(it)) },
                 isEnabled = state.type != null
             )
 
             // 5. Data da Transação
             TransactionDatePickerRow(
                 timestamp = state.dateTimestamp,
-                onDateSelected = onDateSelected
+                onDateSelected = { onEvent(AddTransactionEvent.OnDateSelected(it)) }
             )
 
             // 6. Seção Expansível (Observação e Tags)
             TransactionExtraOptionsSection(
                 note = state.note,
-                onNoteChanged = onNoteChanged,
+                onNoteChanged = { onEvent(AddTransactionEvent.OnNoteChanged(it)) },
                 tags = state.tags,
                 newTagInput = state.newTagInput,
-                onNewTagInputChanged = onNewTagInputChanged,
+                onNewTagInputChanged = { onEvent(AddTransactionEvent.OnNewTagInputChanged(it)) },
                 availableTags = availableTags,
-                onAddTag = onAddTag,
-                onRemoveTag = onRemoveTag
+                onAddTag = { onEvent(AddTransactionEvent.OnAddTag(it)) },
+                onRemoveTag = { onEvent(AddTransactionEvent.OnRemoveTag(it)) }
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             // 7. Botão Salvar
             Button(
-                onClick = onSaveClick,
+                onClick = { onEvent(AddTransactionEvent.OnSaveTransaction(onSuccess = onBackClick)) },
                 enabled = !state.isSaving,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = AccentIndigo
@@ -288,7 +269,7 @@ fun AddTransactionScreen(
 
     if (state.errorMessage != null) {
         AlertDialog(
-            onDismissRequest = onDismissError,
+            onDismissRequest = { onEvent(AddTransactionEvent.OnDismissError) },
             title = {
                 Text(
                     text = stringResource(R.string.title_error_default),
@@ -305,7 +286,7 @@ fun AddTransactionScreen(
                 )
             },
             confirmButton = {
-                TextButton(onClick = onDismissError) {
+                TextButton(onClick = { onEvent(AddTransactionEvent.OnDismissError) }) {
                     Text(stringResource(R.string.text_understood))
                 }
             }

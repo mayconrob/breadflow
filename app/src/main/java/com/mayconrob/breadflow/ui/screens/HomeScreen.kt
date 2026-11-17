@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mayconrob.breadflow.R
 import com.mayconrob.breadflow.domain.enums.TransactionType
+import com.mayconrob.breadflow.domain.model.TransactionWithCategory
 import com.mayconrob.breadflow.ui.components.CategoryBudgetCard
 import com.mayconrob.breadflow.ui.components.MonthYearPickerDialog
 import com.mayconrob.breadflow.ui.components.StatCard
@@ -65,6 +66,7 @@ import com.mayconrob.breadflow.ui.viewmodel.PainelFinanceiroViewModel
 fun HomeRoute(
     modifier: Modifier = Modifier,
     onNavigateToAddTransaction: (TransactionType?) -> Unit,
+    onNavigateToTransactionDetail: (Long) -> Unit,
     viewModel: PainelFinanceiroViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -78,6 +80,7 @@ fun HomeRoute(
         onPreviousMonth = viewModel::onPreviousMonth,
         onNextMonth = viewModel::onNextMonth,
         onMonthYearSelected = viewModel::onMonthYearSelected,
+        onTransactionClick = { item -> onNavigateToTransactionDetail(item.transaction.id) },
         modifier = modifier
     )
 }
@@ -92,6 +95,7 @@ fun HomeScreen(
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     onMonthYearSelected: (year: Int, month: Int) -> Unit,
+    onTransactionClick: (TransactionWithCategory) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showMonthYearPicker by remember { mutableStateOf(false) }
@@ -288,7 +292,8 @@ fun HomeScreen(
             } else {
                 items(state.ultimasTransacoes) { item ->
                     TransactionItem(
-                        item = item
+                        item = item,
+                        onClick = { onTransactionClick(it) }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }

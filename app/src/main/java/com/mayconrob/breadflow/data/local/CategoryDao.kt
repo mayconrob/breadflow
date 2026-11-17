@@ -21,8 +21,20 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CategoryDao {
 
-    @Query("SELECT * FROM categories ORDER BY type, name COLLATE NOCASE ASC")
+
+
+    @Query("""
+        SELECT * FROM categories 
+        ORDER BY 
+            type,
+            CASE 
+                WHEN systemType = 'OTHER' THEN 1 
+                ELSE 0 
+            END ASC,
+            name COLLATE NOCASE ASC
+    """)
     fun getAll(): Flow<List<CategoryEntity>>
+
 
     @Query("SELECT * FROM categories WHERE id = :id LIMIT 1")
     suspend fun getById(id: Long): CategoryEntity?

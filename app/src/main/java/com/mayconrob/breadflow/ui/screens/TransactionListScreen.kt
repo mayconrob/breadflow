@@ -1,4 +1,3 @@
-
 package com.mayconrob.breadflow.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
@@ -14,15 +13,15 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -44,7 +43,6 @@ import com.mayconrob.breadflow.R
 import com.mayconrob.breadflow.common.Formatters
 import com.mayconrob.breadflow.domain.model.Category
 import com.mayconrob.breadflow.domain.model.TransactionWithCategory
-import com.mayconrob.breadflow.ui.components.AddTransactionDialog
 import com.mayconrob.breadflow.ui.components.DateRangePickerDialog
 import com.mayconrob.breadflow.ui.components.TransactionItem
 import com.mayconrob.breadflow.ui.theme.ExpenseRed
@@ -53,15 +51,17 @@ import com.mayconrob.breadflow.ui.viewmodel.ExtratoTransacoesViewModel
 import com.mayconrob.breadflow.ui.viewmodel.enums.OrdemTransacao
 import com.mayconrob.breadflow.ui.viewmodel.enums.TipoFiltroData
 import com.mayconrob.breadflow.ui.viewmodel.enums.TipoFiltroTransacao
+import com.mayconrob.breadflow.ui.components.TransactionOptionsBottomSheet
 
 @Composable
 fun TransactionListRoute(
+    onNavigateToEditTransaction: (Long) -> Unit,
+    onNavigateToTransactionDetail: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ExtratoTransacoesViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
     val categories by viewModel.categories.collectAsState()
-    var editingTransaction by remember { mutableStateOf<TransactionWithCategory?>(null) }
 
     TransactionListScreen(
         state = state,
@@ -72,32 +72,11 @@ fun TransactionListRoute(
         onTipoFiltroTransacaoChanged = viewModel::onTipoFiltroTransacaoChanged,
         onOrdemTransacaoChanged = viewModel::onOrdemTransacaoChanged,
         onPeriodoDataChanged = viewModel::onPeriodoDataChanged,
-        onEditTransactionClick = { editingTransaction = it },
+        onEditTransactionClick = { item -> onNavigateToEditTransaction(item.transaction.id) },
+        onDetailTransactionClick = { item -> onNavigateToTransactionDetail(item.transaction.id) },
         onDeleteTransactionClick = viewModel::deleteTransaction,
         modifier = modifier
     )
-
-    if (editingTransaction != null) {
-        AddTransactionDialog(
-            categories = categories,
-            transactionToEdit = editingTransaction,
-            onDismiss = { editingTransaction = null },
-            onConfirm = { desc, amount, type, categoryId ->
-                val target = editingTransaction
-                if (target != null) {
-                    viewModel.updateTransaction(
-                        target.transaction.copy(
-                            description = desc,
-                            amount = amount,
-                            type = type,
-                            categoryId = categoryId
-                        )
-                    )
-                }
-                editingTransaction = null
-            }
-        )
-    }
 }
 
 @Composable
@@ -111,11 +90,13 @@ fun TransactionListScreen(
     onOrdemTransacaoChanged: (OrdemTransacao) -> Unit,
     onPeriodoDataChanged: (Long?, Long?) -> Unit,
     onEditTransactionClick: (TransactionWithCategory) -> Unit,
+    onDetailTransactionClick: (TransactionWithCategory) -> Unit,
     onDeleteTransactionClick: (TransactionWithCategory) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showDateRangePicker by remember { mutableStateOf(false) }
     var transactionToDelete by remember { mutableStateOf<TransactionWithCategory?>(null) }
+    var selectedTransactionForOptions by remember { mutableStateOf<TransactionWithCategory?>(null) }
 
     Column(
         modifier = modifier
@@ -181,20 +162,26 @@ fun TransactionListScreen(
             }
             item {
                 val isPeriodoActive = state.tipoFiltroData == TipoFiltroData.PERIODO
-                val periodoLabel = if (isPeriodoActive && state.dataInicioTimestamp != null && state.dataFimTimestamp != null) {
-                    stringResource(
-                        R.string.text_from_to_date,
-                        Formatters.formatShortDate(state.dataInicioTimestamp),
-                        Formatters.formatShortDate(state.dataFimTimestamp)
-                    )
-                } else {
-                    stringResource(R.string.text_period_by_date)
-                }
+                val periodoLabel =
+                    if (isPeriodoActive && state.dataInicioTimestamp != null && state.dataFimTimestamp != null) {
+                        stringResource(
+                            R.string.text_from_to_date,
+                            Formatters.formatShortDate(state.dataInicioTimestamp),
+                            Formatters.formatShortDate(state.dataFimTimestamp)
+                        )
+                    } else {
+                        stringResource(R.string.text_period_by_date)
+                    }
 
                 FilterChip(
                     selected = isPeriodoActive,
                     onClick = { showDateRangePicker = true },
-                    leadingIcon = { Icon(imageVector = Icons.Default.DateRange, contentDescription = null) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = null
+                        )
+                    },
                     label = { Text(periodoLabel) },
                     modifier = Modifier.padding(end = 6.dp)
                 )
@@ -270,7 +257,12 @@ fun TransactionListScreen(
                 FilterChip(
                     selected = state.ordemTransacao == OrdemTransacao.MAIS_RECENTES,
                     onClick = { onOrdemTransacaoChanged(OrdemTransacao.MAIS_RECENTES) },
-                    leadingIcon = { Icon(imageVector = Icons.AutoMirrored.Filled.Sort, contentDescription = null) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Sort,
+                            contentDescription = null
+                        )
+                    },
                     label = { Text(stringResource(R.string.most_recent)) },
                     modifier = Modifier.padding(end = 6.dp)
                 )
@@ -315,13 +307,30 @@ fun TransactionListScreen(
                 items(state.transacoes) { item ->
                     TransactionItem(
                         item = item,
-                        onEditClick = onEditTransactionClick,
-                        onDeleteClick = { transactionToDelete = it }
+                        onClick = { onDetailTransactionClick(it) },
+                        onMoreClick = { selectedTransactionForOptions = it }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
+    }
+
+    if (selectedTransactionForOptions != null) {
+        val target = selectedTransactionForOptions!!
+        TransactionOptionsBottomSheet(
+            item = target,
+            onDismiss = { selectedTransactionForOptions = null },
+            onEditClick = { item ->
+                onEditTransactionClick(item)
+            },
+            onDeleteClick = { item ->
+                transactionToDelete = item
+            },
+            onDetailsClick = { item ->
+                onDetailTransactionClick(item)
+            }
+        )
     }
 
     if (showDateRangePicker) {
@@ -338,7 +347,8 @@ fun TransactionListScreen(
 
     if (transactionToDelete != null) {
         val targetTransaction = transactionToDelete!!
-        val categoryName = targetTransaction.transaction.description.ifBlank { targetTransaction.category.name }
+        val categoryName =
+            targetTransaction.transaction.description.ifBlank { targetTransaction.category.name }
         val amountFormatted = Formatters.formatCurrency(targetTransaction.transaction.amount)
 
         AlertDialog(

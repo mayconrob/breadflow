@@ -3,6 +3,7 @@ package com.mayconrob.breadflow.data.local
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.mayconrob.breadflow.domain.enums.SystemType
 import com.mayconrob.breadflow.domain.enums.TransactionType
 import java.math.BigDecimal
 
@@ -15,6 +16,7 @@ data class CategoryEntity(
     val id: Long = 0,
     val name: String,
     val type: TransactionType,
+    val systemType: SystemType? = null,
     val budgetLimit: BigDecimal = BigDecimal.ZERO, // Teto de orçamento mensal em BigDecimal
     val colorHex: String = "#3F51B5"
 )
