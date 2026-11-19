@@ -16,6 +16,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.mayconrob.breadflow.R
+import com.mayconrob.breadflow.domain.enums.SystemType
 import com.mayconrob.breadflow.domain.enums.TransactionType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -123,6 +124,7 @@ abstract class AppDatabase : RoomDatabase() {
                     CategoryEntity(
                         name = context.getString(R.string.text_category_other_entries),
                         type = TransactionType.ENTRY,
+                        systemType = SystemType.OTHER,
                         colorHex = "#8E24AA" // Roxo
                     ),
                     CategoryEntity(
@@ -206,6 +208,7 @@ abstract class AppDatabase : RoomDatabase() {
                     CategoryEntity(
                         name = context.getString(R.string.text_other_expenses),
                         type = TransactionType.EXIT,
+                        systemType = SystemType.OTHER,
                         colorHex = "#616161" // Cinza Neutro
                     )
                 )

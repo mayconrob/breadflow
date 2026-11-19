@@ -40,6 +40,20 @@ sealed class Screen(
         }
     }
 
+    data object EditTransaction {
+        const val ROUTE = "edit_transaction/{transactionId}"
+        fun createRoute(transactionId: Long): String {
+            return "edit_transaction/$transactionId"
+        }
+    }
+
+    data object TransactionDetail {
+        const val ROUTE = "transaction_detail/{transactionId}"
+        fun createRoute(transactionId: Long): String {
+            return "transaction_detail/$transactionId"
+        }
+    }
+
     companion object {
         val bottomNavItems = listOf(Dashboard, Extrato, Categorias)
     }
