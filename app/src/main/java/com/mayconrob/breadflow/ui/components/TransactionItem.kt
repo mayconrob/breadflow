@@ -2,6 +2,7 @@ package com.mayconrob.breadflow.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,8 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,20 +32,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mayconrob.breadflow.R
-import com.mayconrob.breadflow.domain.model.TransactionWithCategory
+import com.mayconrob.breadflow.common.Formatters
 import com.mayconrob.breadflow.domain.enums.TransactionType
+import com.mayconrob.breadflow.domain.model.TransactionWithCategory
 import com.mayconrob.breadflow.ui.theme.DarkCardBorder
 import com.mayconrob.breadflow.ui.theme.DarkSurface
 import com.mayconrob.breadflow.ui.theme.ExpenseRed
 import com.mayconrob.breadflow.ui.theme.IncomeGreen
-import com.mayconrob.breadflow.common.Formatters
 
 @Composable
 fun TransactionItem(
     item: TransactionWithCategory,
     modifier: Modifier = Modifier,
-    onEditClick: ((TransactionWithCategory) -> Unit)? = null,
-    onDeleteClick: ((TransactionWithCategory) -> Unit)? = null
+    onClick: ((TransactionWithCategory) -> Unit)? = null,
+    onMoreClick: ((TransactionWithCategory) -> Unit)? = null
 ) {
     val context = LocalContext.current
 
@@ -56,8 +56,14 @@ fun TransactionItem(
     val amountColor = if (isIncome) IncomeGreen else ExpenseRed
     val formattedDate = Formatters.formatShortDate(item.transaction.dateTimestamp)
 
+    val itemModifier = if (onClick != null) {
+        modifier.clickable { onClick(item) }
+    } else {
+        modifier
+    }
+
     Row(
-        modifier = modifier
+        modifier = itemModifier
             .fillMaxWidth()
             .heightIn(min = 60.dp)
             .clip(RoundedCornerShape(12.dp))
@@ -127,35 +133,16 @@ fun TransactionItem(
                 color = amountColor
             )
 
-            if (onEditClick != null || onDeleteClick != null) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy((-4).dp)
+            if (onMoreClick != null) {
+                IconButton(
+                    onClick = { onMoreClick(item) }
                 ) {
-                    if (onEditClick != null) {
-                        IconButton(
-                            onClick = { onEditClick(item) }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = stringResource(R.string.label_edit_transaction),
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
-                    if (onDeleteClick != null) {
-                        IconButton(
-                            onClick = { onDeleteClick(item) }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = stringResource(R.string.label_delete_transaction),
-                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = stringResource(R.string.cd_more_options),
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
         }

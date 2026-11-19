@@ -14,5 +14,5 @@ data class AddTransactionUiState(
     val tags: List<String> = emptyList(),
     val newTagInput: String = "",
     val isSaving: Boolean = false,
-    @StringRes val errorMessage: Int? = null
+    @param:StringRes val errorMessage: Int? = null
 )

@@ -42,14 +42,6 @@ class AddTransactionViewModel @Inject constructor(
     val uiState: StateFlow<AddTransactionUiState> = _uiState.asStateFlow()
 
     val categories: StateFlow<List<Category>> = categoriaRepository.all
-        .map { list ->
-            list.sortedWith(
-                compareBy { category ->
-                    val nameLower = category.name.trim().lowercase()
-                    if (nameLower.startsWith("outros") || nameLower.startsWith("outras")) 1 else 0
-                }
-            )
-        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -63,7 +55,23 @@ class AddTransactionViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    fun onTypeChanged(type: TransactionType) {
+    fun onEvent(event: AddTransactionEvent) {
+        when (event) {
+            is AddTransactionEvent.OnTypeChanged -> onTypeChanged(event.type)
+            is AddTransactionEvent.OnDescriptionChanged -> onDescriptionChanged(event.description)
+            is AddTransactionEvent.OnAmountChanged -> onAmountChanged(event.rawInput)
+            is AddTransactionEvent.OnCategorySelected -> onCategorySelected(event.categoryId)
+            is AddTransactionEvent.OnNoteChanged -> onNoteChanged(event.note)
+            is AddTransactionEvent.OnDateSelected -> onDateSelected(event.timestamp)
+            is AddTransactionEvent.OnNewTagInputChanged -> onNewTagInputChanged(event.input)
+            is AddTransactionEvent.OnAddTag -> addTag(event.name)
+            is AddTransactionEvent.OnRemoveTag -> removeTag(event.name)
+            is AddTransactionEvent.OnDismissError -> clearError()
+            is AddTransactionEvent.OnSaveTransaction -> saveTransaction(event.onSuccess)
+        }
+    }
+
+    private fun onTypeChanged(type: TransactionType) {
         _uiState.update { current ->
             current.copy(
                 type = type,
@@ -73,11 +81,11 @@ class AddTransactionViewModel @Inject constructor(
         }
     }
 
-    fun onDescriptionChanged(desc: String) {
+    private fun onDescriptionChanged(desc: String) {
         _uiState.update { it.copy(description = desc, errorMessage = null) }
     }
 
-    fun onAmountChanged(rawInput: String) {
+    private fun onAmountChanged(rawInput: String) {
         val digits = rawInput.filter { it.isDigit() }.take(11)
         val parsedCents = digits.toLongOrNull() ?: 0L
         val formatted = if (parsedCents == 0L) {
@@ -89,23 +97,23 @@ class AddTransactionViewModel @Inject constructor(
         _uiState.update { it.copy(amountText = formatted, errorMessage = null) }
     }
 
-    fun onCategorySelected(categoryId: Long) {
+    private fun onCategorySelected(categoryId: Long) {
         _uiState.update { it.copy(selectedCategoryId = categoryId, errorMessage = null) }
     }
 
-    fun onNoteChanged(note: String) {
+    private fun onNoteChanged(note: String) {
         _uiState.update { it.copy(note = note) }
     }
 
-    fun onDateSelected(timestamp: Long) {
+    private fun onDateSelected(timestamp: Long) {
         _uiState.update { it.copy(dateTimestamp = timestamp) }
     }
 
-    fun onNewTagInputChanged(input: String) {
+    private fun onNewTagInputChanged(input: String) {
         _uiState.update { it.copy(newTagInput = input) }
     }
 
-    fun addTag(rawName: String) {
+    private fun addTag(rawName: String) {
         val trimmed = rawName.trim().removePrefix("#")
         if (trimmed.isBlank()) return
 
@@ -133,17 +141,17 @@ class AddTransactionViewModel @Inject constructor(
         }
     }
 
-    fun removeTag(tag: String) {
+    private fun removeTag(tag: String) {
         _uiState.update { current ->
             current.copy(tags = current.tags.filterNot { it.equals(tag, ignoreCase = true) })
         }
     }
 
-    fun clearError() {
+    private fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
     }
 
-    fun saveTransaction(onSuccess: () -> Unit) {
+    private fun saveTransaction(onSuccess: () -> Unit) {
         val state = _uiState.value
         val digits = state.amountText.filter { it.isDigit() }
         val amountParsed = if (digits.isBlank()) null else BigDecimal(digits).movePointLeft(2)
@@ -183,6 +191,5 @@ class AddTransactionViewModel @Inject constructor(
     companion object {
         private val ptBrSymbols = DecimalFormatSymbols(Locale("pt", "BR"))
         private val currencyFormatter = DecimalFormat("#,##0.00", ptBrSymbols)
-
     }
 }

@@ -164,4 +164,10 @@
     <string name="text_other_female">outras</string>
     <string name="text_tag_available">Tag disponível</string>
     <string name="text_tags_available">Tags disponíveis</string>
+    <string name="text_details">Detalhes</string>
+    <string name="title_transaction_details">Detalhes da transação</string>
+    <string name="label_created_at">Cadastrado em</string>
+    <string name="label_tags">Tags</string>
+    <string name="text_edit">Editar</string>
+    <string name="cd_more_options">Mais opções</string>
 </resources>

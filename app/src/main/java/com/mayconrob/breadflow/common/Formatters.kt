@@ -21,7 +21,7 @@ import java.util.TimeZone
 
 object Formatters {
     private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
-    private val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale("pt", "BR"))
+    private val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale("pt", "BR"))
     private val shortDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR"))
     private val monthYearFormat = SimpleDateFormat("MMMM 'de' yyyy", Locale("pt", "BR"))
 
@@ -31,6 +31,10 @@ object Formatters {
     }
     fun formatShortDate(timestamp: Long): String {
         return shortDateFormat.format(Date(timestamp))
+    }
+
+    fun formatDate(timestamp: Long): String {
+        return dateFormat.format(Date(timestamp))
     }
 
     fun getCurrentMonthName(): String {

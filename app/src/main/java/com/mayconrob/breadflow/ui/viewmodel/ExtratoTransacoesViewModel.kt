@@ -2,14 +2,12 @@ package com.mayconrob.breadflow.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mayconrob.breadflow.common.Formatters
+import com.mayconrob.breadflow.domain.enums.TransactionType
 import com.mayconrob.breadflow.domain.model.Category
-import com.mayconrob.breadflow.domain.model.Tag
-import com.mayconrob.breadflow.domain.model.Transaction
 import com.mayconrob.breadflow.domain.model.TransactionWithCategory
 import com.mayconrob.breadflow.domain.repository.ICategoriaRepository
 import com.mayconrob.breadflow.domain.repository.ITransacaoRepository
-import com.mayconrob.breadflow.domain.enums.TransactionType
-import com.mayconrob.breadflow.common.Formatters
 import com.mayconrob.breadflow.ui.viewmodel.enums.OrdemTransacao
 import com.mayconrob.breadflow.ui.viewmodel.enums.TipoFiltroData
 import com.mayconrob.breadflow.ui.viewmodel.enums.TipoFiltroTransacao
@@ -21,7 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 import javax.inject.Inject
 
 private data class FiltrosExtratoParams(
@@ -59,41 +56,40 @@ class ExtratoTransacoesViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery = _searchQuery.asStateFlow()
-
-    private val _selectedCategoryIds = MutableStateFlow<Set<Long>>(emptySet())
-
-    private val _tipoFiltroData = MutableStateFlow(TipoFiltroData.HOJE)
-    val tipoFiltroData = _tipoFiltroData.asStateFlow()
-
-    private val _ordemTransacao = MutableStateFlow(OrdemTransacao.MAIS_RECENTES)
-    val ordemTransacao = _ordemTransacao.asStateFlow()
-
-    private val _dataInicio = MutableStateFlow<Long?>(null)
-    val dataInicio = _dataInicio.asStateFlow()
-
-    private val _dataFim = MutableStateFlow<Long?>(null)
-    val dataFim = _dataFim.asStateFlow()
+    private val searchQuery = MutableStateFlow("")
+    private val selectedCategoryIds = MutableStateFlow<Set<Long>>(emptySet())
+    private val tipoFiltroData = MutableStateFlow(TipoFiltroData.HOJE)
+    private val ordemTransacao = MutableStateFlow(OrdemTransacao.MAIS_RECENTES)
+    private val dataInicio = MutableStateFlow<Long?>(null)
+    private val dataFim = MutableStateFlow<Long?>(null)
 
     private val _uiState = MutableStateFlow(ExtratoTransacoesUiState())
     val uiState: StateFlow<ExtratoTransacoesUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            val filtroDataFlow = combine(_tipoFiltroData, _dataInicio, _dataFim) { tipo, inicio, fim ->
-                Triple(tipo, inicio, fim)
-            }
+            val filtroDataFlow =
+                combine(tipoFiltroData, dataInicio, dataFim) { tipo, inicio, fim ->
+                    Triple(tipo, inicio, fim)
+                }
 
             val filtrosParamsFlow = combine(
-                _searchQuery,
-                _selectedCategoryIds,
+                searchQuery,
+                selectedCategoryIds,
                 _tipoFiltroTransacao,
-                _ordemTransacao,
+                ordemTransacao,
                 filtroDataFlow
             ) { query, filterCatIds, tipoTransacao, ordem, filtroData ->
                 val (tipoData, inicio, fim) = filtroData
-                FiltrosExtratoParams(query, filterCatIds, tipoTransacao, ordem, tipoData, inicio, fim)
+                FiltrosExtratoParams(
+                    query,
+                    filterCatIds,
+                    tipoTransacao,
+                    ordem,
+                    tipoData,
+                    inicio,
+                    fim
+                )
             }
 
             combine(
@@ -102,16 +98,24 @@ class ExtratoTransacoesViewModel @Inject constructor(
             ) { transactions, params ->
                 val trimmedQuery = params.query.trim()
                 val isTagOnlySearch = trimmedQuery.startsWith("#")
-                val cleanQuery = if (isTagOnlySearch) trimmedQuery.removePrefix("#").trim() else trimmedQuery
+                val cleanQuery =
+                    if (isTagOnlySearch) trimmedQuery.removePrefix("#") else trimmedQuery
                 val isSearchActive = cleanQuery.length >= 2
-                val normalizedQuery = if (isSearchActive) Formatters.removeAccents(cleanQuery) else ""
+                val normalizedQuery =
+                    if (isSearchActive) Formatters.removeAccents(cleanQuery) else ""
 
                 // Pre-computa ranges de data uma unica vez fora do loop
-                val todayRange = if (params.tipoData == TipoFiltroData.HOJE) Formatters.getTodayRange() else null
-                val last7DaysRange = if (params.tipoData == TipoFiltroData.ULTIMOS_7_DIAS) Formatters.getLast7DaysRange() else null
-                val periodRange = if (params.tipoData == TipoFiltroData.PERIODO && params.inicio != null && params.fim != null) {
-                    Pair(Formatters.getStartOfDay(params.inicio), Formatters.getEndOfDay(params.fim))
-                } else null
+                val todayRange =
+                    if (params.tipoData == TipoFiltroData.HOJE) Formatters.getTodayRange() else null
+                val last7DaysRange =
+                    if (params.tipoData == TipoFiltroData.ULTIMOS_7_DIAS) Formatters.getLast7DaysRange() else null
+                val periodRange =
+                    if (params.tipoData == TipoFiltroData.PERIODO && params.inicio != null && params.fim != null) {
+                        Pair(
+                            Formatters.getStartOfDay(params.inicio),
+                            Formatters.getEndOfDay(params.fim)
+                        )
+                    } else null
 
                 val transacoesFiltradas = transactions.filter { item ->
                     // 1. Filtro rapido por Tipo de Transacao (O(1))
@@ -129,9 +133,14 @@ class ExtratoTransacoesViewModel @Inject constructor(
                     // 3. Filtro por Data (O(1) numerico com ranges pre-calculados)
                     val timestamp = item.transaction.dateTimestamp
                     val matchesDate = when (params.tipoData) {
-                        TipoFiltroData.HOJE -> todayRange?.let { timestamp in it.first..it.second } ?: true
-                        TipoFiltroData.ULTIMOS_7_DIAS -> last7DaysRange?.let { timestamp in it.first..it.second } ?: true
-                        TipoFiltroData.PERIODO -> periodRange?.let { timestamp in it.first..it.second } ?: true
+                        TipoFiltroData.HOJE -> todayRange?.let { timestamp in it.first..it.second }
+                            ?: true
+
+                        TipoFiltroData.ULTIMOS_7_DIAS -> last7DaysRange?.let { timestamp in it.first..it.second }
+                            ?: true
+
+                        TipoFiltroData.PERIODO -> periodRange?.let { timestamp in it.first..it.second }
+                            ?: true
                     }
                     if (!matchesDate) return@filter false
 
@@ -139,14 +148,19 @@ class ExtratoTransacoesViewModel @Inject constructor(
                     if (isSearchActive) {
                         val matchesTags = item.transaction.tags.any { tag ->
                             tag.name.contains(cleanQuery, ignoreCase = true) ||
-                                Formatters.removeAccents(tag.name).contains(normalizedQuery, ignoreCase = true)
+                                    Formatters.removeAccents(tag.name)
+                                        .contains(normalizedQuery, ignoreCase = true)
                         }
 
                         if (isTagOnlySearch) {
                             if (!matchesTags) return@filter false
                         } else {
-                            val matchesDescription = item.transaction.description.contains(cleanQuery, ignoreCase = true) ||
-                                Formatters.removeAccents(item.transaction.description).contains(normalizedQuery, ignoreCase = true)
+                            val matchesDescription = item.transaction.description.contains(
+                                cleanQuery,
+                                ignoreCase = true
+                            ) ||
+                                    Formatters.removeAccents(item.transaction.description)
+                                        .contains(normalizedQuery, ignoreCase = true)
                             if (!matchesDescription && !matchesTags) return@filter false
                         }
                     }
@@ -180,68 +194,40 @@ class ExtratoTransacoesViewModel @Inject constructor(
     }
 
     fun onSearchQueryChanged(query: String) {
-        _searchQuery.value = query
+        searchQuery.value = query
     }
 
     fun onCategoryFilterChanged(categoryId: Long?) {
         if (categoryId == null) {
-            _selectedCategoryIds.value = emptySet()
+            selectedCategoryIds.value = emptySet()
         } else {
-            val current = _selectedCategoryIds.value.toMutableSet()
+            val current = selectedCategoryIds.value.toMutableSet()
             if (current.contains(categoryId)) {
                 current.remove(categoryId)
             } else {
                 current.add(categoryId)
             }
-            _selectedCategoryIds.value = current
+            selectedCategoryIds.value = current
         }
     }
 
     fun onTipoFiltroDataChanged(tipo: TipoFiltroData) {
-        _tipoFiltroData.value = tipo
+        tipoFiltroData.value = tipo
     }
 
     fun onTipoFiltroTransacaoChanged(tipo: TipoFiltroTransacao) {
         _tipoFiltroTransacao.value = tipo
-        _selectedCategoryIds.value = emptySet()
+        selectedCategoryIds.value = emptySet()
     }
 
     fun onOrdemTransacaoChanged(ordem: OrdemTransacao) {
-        _ordemTransacao.value = ordem
+        ordemTransacao.value = ordem
     }
 
     fun onPeriodoDataChanged(dataInicio: Long?, dataFim: Long?) {
-        _dataInicio.value = dataInicio
-        _dataFim.value = dataFim
-        _tipoFiltroData.value = TipoFiltroData.PERIODO
-    }
-
-    fun addTransaction(
-        description: String,
-        amount: BigDecimal,
-        type: TransactionType,
-        categoryId: Long,
-        dateTimestamp: Long = System.currentTimeMillis(),
-        tags: List<Tag> = emptyList()
-    ) {
-        viewModelScope.launch {
-            val transaction = Transaction(
-                description = description,
-                amount = amount,
-                type = type,
-                categoryId = categoryId,
-                dateTimestamp = dateTimestamp,
-                createdAtTimestamp = System.currentTimeMillis(),
-                tags = tags
-            )
-            transacaoRepository.insert(transaction)
-        }
-    }
-
-    fun updateTransaction(transaction: Transaction) {
-        viewModelScope.launch {
-            transacaoRepository.update(transaction)
-        }
+        this.dataInicio.value = dataInicio
+        this.dataFim.value = dataFim
+        tipoFiltroData.value = TipoFiltroData.PERIODO
     }
 
     fun deleteTransaction(item: TransactionWithCategory) {
